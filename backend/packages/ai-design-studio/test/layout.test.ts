@@ -1,0 +1,24 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import { DiagramType, Graph, Workspace, newWorkspace, migrateWorkspace, validateGenerated, layoutDiagram, collisionWarnings, routeConnections, applyOperations } from '../src/index.js';import { fixture } from './fixtures.js';
+for(const type of DiagramType.options)test(`${type}: schema, measured layout, obstacle routes and round trip`,async()=>{const graph=fixture(type),result=await layoutDiagram(graph);assert.equal(result.nodes.length,graph.components.length);assert.equal(result.edges.length,graph.connections.length);assert.deepEqual(collisionWarnings(graph,result.nodes,result.edges),[]);assert.deepEqual(Graph.parse(JSON.parse(JSON.stringify(graph))),graph);if(type==='sequence'){const messages=result.edges.map(e=>e.points[0].y);assert.deepEqual(messages,[...messages].sort((a,b)=>a-b));assert.ok(result.nodes.find(n=>n.id==='alternative')!.dividers!.length);}if(type==='hld'){const parallel=result.edges.filter(e=>['cache_read','cache_write'].includes(e.id));assert.notDeepEqual(parallel[0].points,parallel[1].points);}for(const e of result.edges)assert.ok(e.points.length>=2);});
+test('rejects unsupported types, message ordering, invalid use cases and deployment direction',()=>{assert.throws(()=>DiagramType.parse('object'));const seq=fixture('sequence');seq.connections[1].order=1;assert.throws(()=>Graph.parse(seq));const use=fixture('use_case');use.connections[0].kind='include';assert.throws(()=>Graph.parse(use));const dep=fixture('deployment');dep.connections[2].source='node';assert.throws(()=>Graph.parse(dep));});
+test('workspace migration and cross diagram consistency are explicit',()=>{const legacy=fixture('uml_class'),workspace=migrateWorkspace(undefined,legacy,{document:{note:'preserve'}});assert.deepEqual(workspace.diagrams[0].graph,legacy);const saved=JSON.parse(JSON.stringify(workspace));assert.deepEqual(Workspace.parse(saved),workspace);workspace.system.entities=[{id:'entity_order',name:'Order',kind:'entity',responsibility:'Orders'}];workspace.diagrams[0].graph.components[0].entityId='entity_order';assert.doesNotThrow(()=>Workspace.parse(workspace));workspace.diagrams[0].graph.components[0].name='Renamed';assert.throws(()=>Workspace.parse(workspace));});
+test('generation honors explicit selection and does not require all types',()=>{const one={system:newWorkspace().system,diagrams:[{title:'Sequence',graph:fixture('sequence')}]};assert.equal(validateGenerated(one,'sequence').diagrams.length,1);assert.throws(()=>validateGenerated(one,'hld'));assert.throws(()=>validateGenerated({...one,diagrams:[...one.diagrams,...one.diagrams]}));});
+test('incremental sequence insertion/reordering and branches preserve unrelated semantics',()=>{const g=fixture('sequence');const before=structuredClone(g.components);const next=applyOperations(g,[{type:'update_connection',id:'submit',patch:{order:5}},{type:'update_connection',id:'fail',patch:{branch:'declined'}}]);assert.deepEqual(next.components,before);assert.equal(next.connections.find(e=>e.id==='submit')!.order,5);assert.equal(g.connections[0].order,1);});
+test('routing avoids an obstacle, separates parallel edges and shows self loops',()=>{const g=fixture('state_machine');const nodes=g.components.map((c,i)=>({id:c.id,x:i*350,y:i%2*200,w:180,h:100}));const edges=routeConnections(g,nodes).edges;assert.ok(edges.find(e=>e.id==='retry')!.points.length>=4);});
+import {newComponent,newConnection,emptyGraph,measureComponent,labelLines,attributeLabel} from '../src/index.js';
+for(const count of [3,24,60])test(`compact layout supports ${count} saved components without collisions`,async()=>{
+  const graph=emptyGraph('hld');
+  for(let i=0;i<count;i++){graph.components.push(newComponent('node_'+i,'server','Service '+i));if(i)graph.connections.push(newConnection('edge_'+i,'node_'+(i-1),'node_'+i,'flow'));}
+  const result=await layoutDiagram(graph);
+  assert.equal(result.nodes.length,count);assert.equal(result.edges.length,count-1);
+  assert.deepEqual(collisionWarnings(graph,result.nodes,result.edges),[]);
+});
+test('compact UML sizing wraps long members and keeps parent classes above children',async()=>{
+  const graph=fixture('uml_class');graph.connections.find(e=>e.id==='pay_gateway')!.kind='realization';const component=graph.components[0];
+  component.attributes[0].name='very_long_customer_attribute_name_that_needs_wrapping_without_overflow';
+  const size=measureComponent(component);assert.ok(size.w<=336);
+  const lines=labelLines(attributeLabel(component.attributes[0]),Math.floor((size.w-24)/7.5));assert.ok(lines.length>1);
+  const result=await layoutDiagram(graph);
+  for(const edge of graph.connections.filter(e=>['generalization','realization'].includes(e.kind))){const child=result.nodes.find(n=>n.id===edge.source)!,parent=result.nodes.find(n=>n.id===edge.target)!;assert.ok(parent.y<child.y);}
+});

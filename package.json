@@ -1,0 +1,27 @@
+{
+  "name": "multi-agent-app-builder",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend/web",
+    "backend/api",
+    "backend/packages/*"
+  ],
+  "scripts": {
+    "predev": "npm run build --workspace=@multi-agent/ai-design-studio",
+    "prebuild": "npm run build --workspace=@multi-agent/ai-design-studio",
+    "dev": "concurrently \"npm run dev --workspace=backend/api\" \"npm run dev --workspace=frontend/web\"",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "db:setup": "node scripts/db-setup.js",
+    "db:seed": "node scripts/db-seed.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2"
+  }
+}

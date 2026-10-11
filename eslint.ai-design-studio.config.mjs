@@ -1,0 +1,2 @@
+import tseslint from 'typescript-eslint';
+export default [{ ignores: ['**/dist/**','**/node_modules/**','**/dist-ai-design-studio/**'] },...tseslint.configs.recommended,{files:['frontend/web/src/ai-design-studio/**/*.{ts,tsx}','backend/api/src/ai-design-studio/**/*.ts','backend/packages/ai-design-studio/**/*.ts','scripts/ai-design-studio*.ts'],rules:{'@typescript-eslint/no-explicit-any':'error','@typescript-eslint/no-unused-vars':['error',{argsIgnorePattern:'^_',varsIgnorePattern:'^_'}]}}];

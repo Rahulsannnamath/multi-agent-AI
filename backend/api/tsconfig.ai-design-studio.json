@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.json","compilerOptions":{"outDir":"./dist-ai-design-studio","rootDir":"./src"},"include":["src/ai-design-studio/**/*.ts"]}

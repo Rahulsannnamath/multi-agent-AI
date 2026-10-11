@@ -1,0 +1,131 @@
+/* apps/web/src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-700;
+  }
+  body {
+    @apply bg-gray-950 text-gray-100 font-sans antialiased;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+  }
+  ::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-600;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-gray-900 border border-gray-800 rounded-xl p-6;
+  }
+  .card-sm {
+    @apply bg-gray-900 border border-gray-800 rounded-lg p-4;
+  }
+  .btn-primary {
+    @apply bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200 border border-gray-700;
+  }
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-success {
+    @apply badge bg-emerald-900/50 text-emerald-300 border border-emerald-800;
+  }
+  .badge-error {
+    @apply badge bg-red-900/50 text-red-300 border border-red-800;
+  }
+  .badge-warning {
+    @apply badge bg-amber-900/50 text-amber-300 border border-amber-800;
+  }
+  .badge-info {
+    @apply badge bg-blue-900/50 text-blue-300 border border-blue-800;
+  }
+  .badge-purple {
+    @apply badge bg-purple-900/50 text-purple-300 border border-purple-800;
+  }
+  .input {
+    @apply bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-full;
+  }
+  .select {
+    @apply input appearance-none cursor-pointer;
+  }
+  .label {
+    @apply text-sm font-medium text-gray-300 mb-1 block;
+  }
+  .section-title {
+    @apply text-lg font-semibold text-white;
+  }
+  .code-block {
+    @apply bg-gray-950 border border-gray-800 rounded-lg p-4 font-mono text-sm text-gray-300 overflow-auto;
+  }
+  .metric-card {
+    @apply card-sm flex flex-col gap-1;
+  }
+  .metric-value {
+    @apply text-2xl font-bold text-white;
+  }
+  .metric-label {
+    @apply text-sm text-gray-400;
+  }
+  .status-dot {
+    @apply w-2 h-2 rounded-full inline-block;
+  }
+  .status-dot-running {
+    @apply status-dot bg-blue-400 animate-pulse;
+  }
+  .status-dot-success {
+    @apply status-dot bg-emerald-400;
+  }
+  .status-dot-error {
+    @apply status-dot bg-red-400;
+  }
+  .status-dot-pending {
+    @apply status-dot bg-gray-500;
+  }
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150;
+  }
+  .sidebar-link-active {
+    @apply sidebar-link bg-indigo-600/20 text-indigo-300 border border-indigo-600/30;
+  }
+  .sidebar-link-inactive {
+    @apply sidebar-link text-gray-400 hover:text-gray-200 hover:bg-gray-800;
+  }
+}
+
+/* React Flow customization */
+.react-flow__node {
+  @apply rounded-xl border-2 transition-all duration-150;
+}
+.react-flow__background {
+  background-color: #0a0a0f !important;
+}
+.react-flow__controls {
+  @apply bg-gray-900 border border-gray-700 rounded-lg overflow-hidden shadow-xl;
+}
+.react-flow__controls-button {
+  @apply bg-gray-900 text-gray-300 hover:bg-gray-800 border-b border-gray-700;
+}
+.react-flow__minimap {
+  @apply bg-gray-900 border border-gray-700 rounded-lg;
+}
